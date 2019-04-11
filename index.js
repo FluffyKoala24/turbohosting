@@ -16,6 +16,46 @@ bot.on("message", async message => {
     let messageArray = message.content.split(" ");
     let cmd = messageArray[0];
     let args = messageArray.slice(1);
+ 
+    bot.on("guildMemberAdd", (member) => {
+      const guild = member.guild;
+      if (!newUsers[guild.id]) newUsers[guild.id] = new Discord.Collection();
+      newUsers[guild.id].set(member.id, member.user);
+    
+      if (newUsers[guild.id].size > 10) {
+        const userlist = newUsers[guild.id].map(u => u.toString()).join(" ");
+        guild.channels.find(channel => channel.name === "welkom").send("Welkom in onze server!\n" + userlist);
+        newUsers[guild.id].clear();
+      }
+    });
+    
+    bot.on("guildMemberRemove", (member) => {
+      const guild = member.guild;
+      if (newUsers[guild.id].has(member.id)) newUsers.delete(member.id);
+    });
+
+    if(cmd === `${prefix}prijzen`){
+      let prijsembed = new Discord.RichEmbed()
+      .setDescription("Prijzen")
+      .setColor("RANDOM")
+      .addField("Minecraft Server", "Voor de Minecraft Servers dient u een ticket te maken en daar word alles overlegd: permaand")
+      .addField("Website Pakketen", "-Kleine pakket €2.00 -normal pakket €3.00,groot pakket €4.00 -xxl pakket €5.0: permaand")
+      .addField("Domeinen", ".nl 1.20, .be 1.20: perjaar")
+
+      return message.channel.send(prijsembed);
+      
+    }
+
+    if(cmd === `${prefix}website`){
+      let siteembed = new Discord.RichEmbed()    
+      .setDescription("Website")
+      .addField("Site link", "https://www.turbo-hosting.nl/")
+      .addField("Info", "Op onze website kan je ook de dingen bestellen die we in de discord server hebben alleen op  de website staat meer")
+  
+      return message.channel.send(siteembed)
+    }
+
+
 
     if(cmd === `${prefix}help`){
         let helpembed = new Discord.RichEmbed()
@@ -104,7 +144,7 @@ bot.on("message", async message => {
                 SEND_MESSAGES: true,
                 READ_MESSAGES: true
             });
-            message.channel.send(`:white_check_mark: Je ticket is gemaakt, #${c.name}.`);
+            message.channel.send(`:white_check_markb: Je ticket is gemaakt, #${c.name}.`);
             const embed = new Discord.RichEmbed()
                 .setColor(0xCF40FA)
                 .addField(`Hey ${message.author.username}!`, `Probeer uit te leggen waarom je dit ticket zo gedetailleerd mogelijk hebt geopend. Onze **Support Staff** zal binnenkort beschikbaar zijn om te helpen.`)
